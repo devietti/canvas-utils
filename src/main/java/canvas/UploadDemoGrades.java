@@ -13,7 +13,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 /** For a given assignment, upload the same grade for each student. Used when almost everyone gets the same score (like
- *  for demos), and we manually adjust grades after the fact. */
+ *  for demos), and we manually adjust grades after the fact.
+ *  NB: Canvas has a "set default grade" option in the Gradebook that obviates this. */
 public class UploadDemoGrades {
 
     private static String ASSIGNMENT_ID = null;

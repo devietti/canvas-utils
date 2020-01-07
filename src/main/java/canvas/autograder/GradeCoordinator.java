@@ -93,30 +93,30 @@ public class GradeCoordinator {
     public static final Duration LOCK_PERIOD = Duration.ofHours(48);
 
     final public static Lab[] LABS = new Lab[] {
-            new Lab(7240928, "lab1", Paths.get("rca.zip"), strs("rca.v","output/rca4.bit"), Paths.get("lab1")),
+            new Lab(7513535, "lab1", Paths.get("rca.zip"), strs("rca.v","output/rca4.bit"), Paths.get("lab1")),
 
-            new Lab(7240935,  "lab2div", Paths.get("lc4_divider.v"), null, Paths.get("lab2-div")),
-            new Lab(7240930,  "lab2alu", Paths.get("alu.zip"),
+            new Lab(7513541,  "lab2div", Paths.get("lc4_divider.v"), null, Paths.get("lab2-div")),
+            new Lab(7513537,  "lab2alu", Paths.get("alu.zip"),
                     strs("lc4_divider.v", "lc4_cla.v", "lc4_alu.v", "output/alu.bit"), Paths.get("lab2-alu")),
 
-            new Lab(7240938, "lab3alu", Paths.get("single.zip"),
+            new Lab(7513543, "lab3alu", Paths.get("single.zip"),
                     strs("lc4_regfile.v","lc4_single.v","lc4_divider.v","lc4_cla.v","lc4_alu.v","output/singlecycle.bit"),
                     Paths.get("lab3-singlecycle")),
-            new Lab(7240939, "lab3full", Paths.get("single.zip"),
+            new Lab(7513544, "lab3full", Paths.get("single.zip"),
                     strs("lc4_regfile.v","lc4_single.v","lc4_divider.v","lc4_cla.v","lc4_alu.v","output/singlecycle.bit"),
                     Paths.get("lab3-singlecycle")),
 
-            new Lab(7240943,  "lab4alu", Paths.get("pipeline.zip"),
+            new Lab(7513547,  "lab4alu", Paths.get("pipeline.zip"),
                     strs("lc4_regfile.v", "lc4_pipeline.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/pipeline.bit"),
                     Paths.get("lab4-pipeline")),
-            new Lab(7240945,  "lab4full", Paths.get("pipeline.zip"),
+            new Lab(7513548,  "lab4full", Paths.get("pipeline.zip"),
                     strs("lc4_regfile.v", "lc4_pipeline.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/pipeline.bit"),
                     Paths.get("lab4-pipeline")),
 
-            new Lab(7240949,  "lab5alu", Paths.get("superscalar.zip"),
+            new Lab(7513549,  "lab5alu", Paths.get("superscalar.zip"),
                     strs("lc4_regfile_ss.v", "lc4_superscalar.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/superscalar.bit"),
                     Paths.get("lab5-superscalar")),
-            new Lab(7240951,  "lab5full", Paths.get("superscalar.zip"),
+            new Lab(7513550,  "lab5full", Paths.get("superscalar.zip"),
                     strs("lc4_regfile_ss.v", "lc4_superscalar.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/superscalar.bit"),
                     Paths.get("lab5-superscalar"))
     };
@@ -201,7 +201,7 @@ public class GradeCoordinator {
                     u.email = "";
                 }
             }
-            if (Options.has(TestMode) && u.email.startsWith("g020333") && u.email.endsWith("@seas.upenn.edu")) {
+            if (Options.has(TestMode) && u.email.startsWith("g02") && u.email.endsWith("@seas.upenn.edu")) {
                 // in test mode, replace all fake students' emails with Joe's
                 u.email = "devietti@cis.upenn.edu";
             }

@@ -26,7 +26,7 @@ public class Common {
 
     public static final String BASE_URL = "https://upenn.instructure.com/api/v1/";
 
-    private static String MY_COURSE_ID = "1473828"; // CIS 501 Fall 2019
+    private static String MY_COURSE_ID = "1493255"; // CIS 371 Spring 2020
     private static final String SANDBOX_COURSE_ID = "1177025";
     private static String COURSE_URL = BASE_URL+"courses/"+ CourseID() +"/";
 
