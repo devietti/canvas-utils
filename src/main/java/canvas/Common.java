@@ -37,10 +37,10 @@ public class Common {
      */
     public static String TOKEN = null;
     public static String INSTRUCTOR_TOKEN = null;
-    public static String STUDENT2_TOKEN = null;
-    public static String STUDENT3_TOKEN = null;
-    public static String STUDENT4_TOKEN = null;
-    public static String STUDENT5_TOKEN = null;
+    public static String STUDENTA_TOKEN = null;
+    public static String STUDENTB_TOKEN = null;
+    public static String STUDENTC_TOKEN = null;
+    public static String STUDENTD_TOKEN = null;
 
     static final String CANVAS_SID_COLUMN = "Canvas Student ID";
     static final String PENN_SID_COLUMN = "Penn Student ID";
@@ -53,10 +53,10 @@ public class Common {
                      TrackExtensionUsage.class.getClassLoader().getResourceAsStream("canvas.properties")) {
             prop.load(stream);
             INSTRUCTOR_TOKEN = prop.getProperty("JoeKey");
-            STUDENT2_TOKEN = prop.getProperty("TestStudent2Key");
-            STUDENT3_TOKEN = prop.getProperty("TestStudent3Key");
-            STUDENT4_TOKEN = prop.getProperty("TestStudent4Key");
-            STUDENT5_TOKEN = prop.getProperty("TestStudent5Key");
+            STUDENTA_TOKEN = prop.getProperty("TestStudentAKey");
+            STUDENTB_TOKEN = prop.getProperty("TestStudentBKey");
+            STUDENTC_TOKEN = prop.getProperty("TestStudentCKey");
+            STUDENTD_TOKEN = prop.getProperty("TestStudentDKey");
             TOKEN = INSTRUCTOR_TOKEN;
         }
     }

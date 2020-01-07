@@ -302,7 +302,7 @@ public class AutograderTest {
             Common.putJSON(url, add, "assignment");
 
             // Student2 does the submission
-            Common.TOKEN = STUDENT2_TOKEN;
+            Common.TOKEN = STUDENTA_TOKEN;
 
             ProcessBuilder pb;
 
@@ -424,10 +424,10 @@ public class AutograderTest {
             //System.err.format("AG told us: %s %n", (-1 == i) ? "-1" : SocketMessage.values()[i].toString());
 
 
-            String[] tokens = new String[]{STUDENT2_TOKEN};
+            String[] tokens = new String[]{STUDENTA_TOKEN};
             if (asn.isGroupAssignment()) {
                 // validate that other group member sees same results
-                tokens = new String[]{STUDENT2_TOKEN, STUDENT3_TOKEN};
+                tokens = new String[]{STUDENTA_TOKEN, STUDENTB_TOKEN};
             }
             for (String token : tokens) {
                 Common.TOKEN = token;
@@ -532,7 +532,7 @@ public class AutograderTest {
             Common.putJSON(url, add, "assignment");
 
             // Student2 does the submission
-            Common.TOKEN = STUDENT2_TOKEN;
+            Common.TOKEN = STUDENTA_TOKEN;
 
             File fileToUpload = new File(RES_DIR, "lab1-fakegrade.v");
             assertTrue(fileToUpload.toString(), fileToUpload.canRead());
@@ -583,7 +583,7 @@ public class AutograderTest {
             assertTrue(fileToUpload.toString(), fileToUpload.canRead());
 
             // each test student does a submission
-            final List<String> TOKENS = Arrays.asList(STUDENT2_TOKEN, STUDENT3_TOKEN, STUDENT4_TOKEN, STUDENT5_TOKEN);
+            final List<String> TOKENS = Arrays.asList(STUDENTA_TOKEN, STUDENTB_TOKEN, STUDENTC_TOKEN, STUDENTD_TOKEN);
             List<Submission> initSubs = TOKENS.stream().map(token -> {
                 Common.TOKEN = token;
 
