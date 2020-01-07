@@ -246,6 +246,9 @@ public class GradeCoordinator {
                     if (Nop.ch == c) {
                         LOG.finest("nop command received via socket");
                         continue;
+                    } else if (Version.ch == c) {
+                        LOG.info("Canvas autograder version: "+Common.VERSION);
+                        continue;
                     } else if (Run.ch == c) {
                         LOG.info("run command received via socket");
                     } else if (ParallelGrading.ch == c) {

@@ -29,6 +29,7 @@ public class Common {
     private static String MY_COURSE_ID = "1493255"; // CIS 371 Spring 2020
     private static final String SANDBOX_COURSE_ID = "1177025";
     private static String COURSE_URL = BASE_URL+"courses/"+ CourseID() +"/";
+    public static final String VERSION = "v1.0.0";
 
     private static final String SANDBOX_BASE_URL = BASE_URL+"courses/"+SANDBOX_COURSE_ID+"/";
     public static final HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory(request -> request.setParser(new JsonObjectParser(new GsonFactory())));
