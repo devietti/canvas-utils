@@ -95,7 +95,7 @@ public class GradeCoordinator {
     final public static Lab[] LABS = new Lab[] {
             new Lab(7513535, "lab1", Paths.get("rca.zip"), strs("rca.v","output/rca4.bit"), Paths.get("lab1")),
 
-            new Lab(7513541,  "lab2div", Paths.get("lc4_divider.v"), null, Paths.get("lab2-div")),
+            new Lab(7651954,  "lab2div", Paths.get("lc4_divider.v"), null, Paths.get("lab2-div")),
             new Lab(7513537,  "lab2alu", Paths.get("alu.zip"),
                     strs("lc4_divider.v", "lc4_cla.v", "lc4_alu.v", "output/alu.bit"), Paths.get("lab2-alu")),
 
@@ -225,7 +225,7 @@ public class GradeCoordinator {
                 serverSocket.setSoTimeout(120 * 1000); // 2 minutes
                 sock = serverSocket.accept();
             } else {
-                serverSocket.setSoTimeout(60 * 1000); // 1 minute
+                serverSocket.setSoTimeout(5 * 1000); // 5 seconds
             }
             while (true) {
                 OutputStream sockOut = null;
@@ -310,6 +310,11 @@ public class GradeCoordinator {
                 }
 
                 waitOnFutures(sockOut);
+
+                // in production mode, run once and then exit. Rely on cronjob to poll for new submissions.
+                if (!Options.has(TestMode)) {
+                    return;
+                }
 
             } // end main loop
         } // end ServerSocker try
@@ -457,7 +462,7 @@ public class GradeCoordinator {
         String nodeName = String.format("cis501@big%02d.seas.upenn.edu", biglabNodes.get(0));
         FutureTask<Boolean> runGradeWorker = new FutureTask<>(() -> {
             ProcessBuilder pb = new ProcessBuilder("ssh", "-o", "StrictHostKeyChecking=no", nodeName,
-                    "java", "-enableassertions", "-cp", "CanvasUtils-1.0-SNAPSHOT-jar-with-dependencies.jar",
+                    "java", "-enableassertions", "-cp", "CanvasUtils-2.0.0-jar-with-dependencies.jar",
                     "canvas.autograder.GradeWorker", "--submitted-file", submittedFile.toString(),
                     "--submission-dir", SUBM_DIR.toString(),
                     "--assignment", String.valueOf(Options.has(TestMode) ? THE_LAB.canvasAssnId : sub.assignment_id));
