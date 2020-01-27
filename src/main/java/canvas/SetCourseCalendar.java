@@ -87,108 +87,94 @@ public class SetCourseCalendar {
      * NB: Canvas will strip invalid HTML tags, so can't use angle brackets in the tag
      */
     private static final String AUTOGEN_TAG = "[auto-generated]";
-    private static final int THE_YEAR = 2019;
+    private static final int THE_YEAR = 2020;
     private static final String TIMEZONE = "America/New_York";
     private static final Calendar OH_CAL = new Calendar();
-    private static final String OH_ICAL_FILE = "cis501oh.ics";
+    private static final String COURSE_NUMBER = "371";
+    private static final String OH_ICAL_FILE = "cis"+COURSE_NUMBER+"oh.ics";
 
     // current semester information
-    private static final LocalDate FIRST_DAY = LocalDate.of(THE_YEAR, Month.AUGUST, 28);
-    private static final LocalDate LAST_DAY_OF_CLASSES = LocalDate.of(THE_YEAR, Month.DECEMBER, 9);
-    private static final LocalDate LAST_DAY_OF_SEMESTER = LocalDate.of(THE_YEAR, Month.DECEMBER, 19);
+    private static final LocalDate FIRST_DAY = LocalDate.of(THE_YEAR, Month.JANUARY, 15);
+    private static final LocalDate LAST_DAY_OF_CLASSES = LocalDate.of(THE_YEAR, Month.APRIL, 29);
+    private static final LocalDate LAST_DAY_OF_SEMESTER = LocalDate.of(THE_YEAR, Month.MAY, 12);
     private static final LocalDate[] BREAKS = new LocalDate[]{
+            LocalDate.of(THE_YEAR, Month.MARCH, 9), // Spring Break
+            LocalDate.of(THE_YEAR, Month.MARCH, 10), // Spring Break
+            LocalDate.of(THE_YEAR, Month.MARCH, 11), // Spring Break
+            LocalDate.of(THE_YEAR, Month.MARCH, 12), // Spring Break
+            LocalDate.of(THE_YEAR, Month.MARCH, 13), // Spring Break
+            /*
             LocalDate.of(THE_YEAR, Month.SEPTEMBER, 2), // Labor Day
             LocalDate.of(THE_YEAR, Month.OCTOBER, 10), // Fall Break
             LocalDate.of(THE_YEAR, Month.OCTOBER, 11), // Fall Break
             LocalDate.of(THE_YEAR, Month.NOVEMBER, 27), // pre-Thanksgiving schedule switch
             LocalDate.of(THE_YEAR, Month.NOVEMBER, 28), // Thanksgiving
             LocalDate.of(THE_YEAR, Month.NOVEMBER, 29) // Thanksgiving
+             */
     };
 
     // class/OH schedule
     private static final RepeatingCourseEvent[] REPEATING_COURSE_EVENTS = new RepeatingCourseEvent[]{
-            new RepeatingCourseEvent("CIS 501", EventType.CLASS, "Moore 216",
+            new RepeatingCourseEvent("CIS "+COURSE_NUMBER, EventType.CLASS, "Towne 100",
                     LocalTime.of(13, 30), Duration.ofMinutes(90),
-                    new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY},
+                    new DayOfWeek[]{DayOfWeek.TUESDAY, DayOfWeek.THURSDAY},
                     FIRST_DAY, LAST_DAY_OF_CLASSES, null),
 
-            /*new RepeatingCourseEvent("CIS 501 OH (Sam)", EventType.OFFICE_HOURS, "Levine 5th floor bump space",
-                    LocalTime.of(11, 0), Duration.ofMinutes(60),
+            new RepeatingCourseEvent("CIS "+COURSE_NUMBER+" OH (Brandon)", EventType.OFFICE_HOURS, "Ketterer Lab (Moore 200)",
+                    LocalTime.of(15, 0), Duration.ofHours(4),
+                    new DayOfWeek[]{DayOfWeek.SATURDAY},
+                    LocalDate.of(THE_YEAR, Month.JANUARY, 26), LAST_DAY_OF_CLASSES,
+                    null),
+            new RepeatingCourseEvent("CIS "+COURSE_NUMBER+" OH (Joe)", EventType.OFFICE_HOURS, "Levine 572",
+                    LocalTime.of(12, 30), Duration.ofMinutes(90),
                     new DayOfWeek[]{DayOfWeek.MONDAY},
-                    LocalDate.of(THE_YEAR, Month.SEPTEMBER, 10), LAST_DAY_OF_CLASSES,
-                    null),
-            new RepeatingCourseEvent("CIS 501 OH (Sam)", EventType.OFFICE_HOURS, "Levine 5th floor bump space",
-                    LocalTime.of(13, 0), Duration.ofMinutes(120),
-                    new DayOfWeek[]{DayOfWeek.THURSDAY},
-                    LocalDate.of(THE_YEAR, Month.SEPTEMBER, 9), LAST_DAY_OF_CLASSES,
-                    null),*/
-            new RepeatingCourseEvent("CIS 501 OH (Alex)", EventType.OFFICE_HOURS, "Levine 5th floor bump space",
-                    LocalTime.of(15, 0), Duration.ofMinutes(90),
+                    LocalDate.of(THE_YEAR, Month.JANUARY, 26), LAST_DAY_OF_CLASSES,
+                    new LocalDate[]{
+                            LocalDate.of(THE_YEAR, Month.FEBRUARY, 17), // President's Day, Sylvia off
+                            LocalDate.of(THE_YEAR, Month.MARCH, 16), // ASPLOS
+            }),
+            new RepeatingCourseEvent("CIS "+COURSE_NUMBER+" OH (Eric)", EventType.OFFICE_HOURS, "Ketterer Lab (Moore 200)",
+                    LocalTime.of(16, 0), Duration.ofMinutes(90),
                     new DayOfWeek[]{DayOfWeek.MONDAY,DayOfWeek.WEDNESDAY},
-                    LocalDate.of(THE_YEAR, Month.SEPTEMBER, 16), LAST_DAY_OF_CLASSES,
+                    LocalDate.of(THE_YEAR, Month.FEBRUARY, 2), LAST_DAY_OF_CLASSES,
                     null),
-            new RepeatingCourseEvent("CIS 501 OH (Grant)", EventType.OFFICE_HOURS, "Ketterer Lab (Moore 200)",
-                    LocalTime.of(15, 0), Duration.ofMinutes(90),
-                    new DayOfWeek[]{DayOfWeek.TUESDAY,DayOfWeek.THURSDAY},
-                    LocalDate.of(THE_YEAR, Month.SEPTEMBER, 11), LAST_DAY_OF_CLASSES,
-                    null),
-            new RepeatingCourseEvent("CIS 501 OH (Joe)", EventType.OFFICE_HOURS, "Levine 572",
-                    LocalTime.of(10, 0), Duration.ofMinutes(90),
-                    new DayOfWeek[]{DayOfWeek.THURSDAY},
-                    LocalDate.of(THE_YEAR, Month.SEPTEMBER, 9), LAST_DAY_OF_CLASSES,
-                    null),
-            new RepeatingCourseEvent("CIS 501 OH (Brandon)", EventType.OFFICE_HOURS, "K Lab",
-                    LocalTime.of(20, 0), Duration.ofMinutes(180),
-                    new DayOfWeek[]{DayOfWeek.SUNDAY},
-                    LocalDate.of(THE_YEAR, Month.OCTOBER, 6), LocalDate.of(THE_YEAR, Month.OCTOBER, 13),
-                    null),
-            new RepeatingCourseEvent("CIS 501 OH (Brandon)", EventType.OFFICE_HOURS, "K Lab",
-                    LocalTime.of(18, 0), Duration.ofMinutes(180),
-                    new DayOfWeek[]{DayOfWeek.SUNDAY},
-                    LocalDate.of(THE_YEAR, Month.OCTOBER, 15), LAST_DAY_OF_CLASSES,
-                    null),
+
     };
 
     // one-off events like review sessions and exams
     private static final OneOffCourseEvent[] ONE_OFF_COURSE_EVENTS = new OneOffCourseEvent[]{
 
-
             /*
             new OneOffCourseEvent("CIS 501 OH (Joe)", "K Lab",
                     LocalDateTime.of(THE_YEAR, Month.APRIL, 5, 13, 0), Duration.ofHours(1)),
-            new OneOffCourseEvent("CIS 501 OH (Joe)", "K Lab",
-                    LocalDateTime.of(THE_YEAR, Month.APRIL, 12, 11, 0), Duration.ofHours(1)),
-            new OneOffCourseEvent("CIS 501 OH (Joe)", "K Lab",
-                    LocalDateTime.of(THE_YEAR, Month.APRIL, 26, 11, 0), Duration.ofHours(1)),
                     */
 
-            new OneOffCourseEvent("CIS 501 Midterm Exam", "Moore 216",
-                    LocalDateTime.of(THE_YEAR, Month.OCTOBER, 2, 13, 30), Duration.ofMinutes(90)),
-            new OneOffCourseEvent("CIS 501 Final Exam", "DRL A8",
-                    LocalDateTime.of(THE_YEAR, Month.DECEMBER, 16, 12, 0), Duration.ofHours(2))
+            new OneOffCourseEvent("CIS 371 Final Exam", "TBD",
+                    LocalDateTime.of(THE_YEAR, Month.MAY, 7, 9, 0), Duration.ofHours(2))
     };
 
     private static final String[] CLASS_TOPICS = new String[]{
             "Introduction",
             "Verilog (ILS Ch 1)", "Verilog (ILS Ch 1)",
             "ALU (COD Ch 3)", "ALU (COD Ch 3)",
-            "ISAs",
+            "ISAs", "Performance (COD Ch 7.10)",
             "Datapath (COD Ch 4.1-4.4)", "Datapath (COD Ch 4)",
-            "Rosh Hashana (no class)",
-            "Midterm Exam (in class)",
-            "Performance (COD Ch 7.10)",
-            "Yom Kippur (no class)",
-            "Debugging Strategies",
             "Pipeline (COD Ch 4)", "Pipeline (COD Ch 4)",
             "Branch Prediction (COD Ch 4)",
-            "Caches (COD Ch 5.1-5.2)", "Caches (COD Ch 5.1-5.2)", "Caches (COD Ch 5.3)",
-            "Superscalar (COD pp 391-7)", "Superscalar",
+            "Caches (COD Ch 5.1-5.2)",
+            "Debugging Strategies",
+            "Midterm Exam (in class)",
+            //"No class (Spring Break)","No class (Spring Break)",
+            "Caches (COD Ch 5.1-5.2)", "Caches (COD Ch 5.3)",
+            "Caches (COD Ch 5.3)", "Superscalar (COD pp 391-7)",
             "Out-of-Order (COD pp 397-402)", "Out-of-Order",
-            //"Memory (COD Ch 5.4)",
+            "Memory (COD Ch 5.4)",
             "DRAM, Spectre/Meltdown Attacks",
             "Multicore (COD Ch 7.1-7.3)",
             "Multicore (COD Ch 7.1-7.3)",
-            "GPUs (COD Ch 7.7)", "TPUs and accelerators"
+            "Multicore (COD Ch 7.1-7.3)",
+            "GPUs (COD Ch 7.7)",
+            "TPUs and accelerators"
     };
 
     public static void main(String[] args) throws IOException {
@@ -196,7 +182,7 @@ public class SetCourseCalendar {
         Common.setup();
 
         // setup OH calendar
-        OH_CAL.getProperties().add(new ProdId("-//CIS 501 Office Hours//iCal4j 1.0//EN"));
+        OH_CAL.getProperties().add(new ProdId("-//CIS "+COURSE_NUMBER+" Office Hours//iCal4j 1.0//EN"));
         OH_CAL.getProperties().add(Version.VERSION_2_0);
         OH_CAL.getProperties().add(CalScale.GREGORIAN);
         UidGenerator ug = new FixedUidGenerator("uidGen");
@@ -273,6 +259,7 @@ public class SetCourseCalendar {
                     LocalDateTime eventStart = d.atTime(ce.startTime);
                     addEventToCanvas(new OneOffCourseEvent(eventName, ce.location, eventStart, ce.duration));
                 } else { // put OH on the OH calendar
+                    System.out.println(ce.name + " " + ce.startTime);
                     VEvent oh = new VEvent(new DateTime(jdate(ce.startTime,d_)), ce.duration, ce.name);
                     Location place = new Location(ce.location);
                     oh.getProperties().add(place);
@@ -301,14 +288,6 @@ public class SetCourseCalendar {
             FileOutputStream fout = new FileOutputStream(OH_ICAL_FILE);
             CalendarOutputter outputter = new CalendarOutputter();
             outputter.output(OH_CAL, fout);
-
-            // scp OH calendar to course website
-            try {
-                ProcessBuilder scp = new ProcessBuilder("bash", "-c", "scp " + OH_ICAL_FILE + " 501:public_html/current/");
-                Common.check_call(scp);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
