@@ -17,6 +17,7 @@ import static canvas.Common.requestFactory;
 
 /**
  * Run tests against our LTI web app.
+ * @deprecated
  */
 @RunWith(Parameterized.class)
 public class LTITest extends TestCase {
@@ -101,6 +102,10 @@ public class LTITest extends TestCase {
     }
 
     @org.junit.Test
+    public void ltiTestingIsDeprecated() { }
+
+    // TODO: LTI testing is deprecated now, we use a cron job to poll for Canvas submissions instead
+    //@org.junit.Test
     public void runTest() throws IOException {
         HttpResponse response = postToLTITool(POST_PARAMS, localFilename, uploadedFilename);
 
