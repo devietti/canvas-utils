@@ -1,9 +1,6 @@
 package canvas;
 
-import canvas.apiobjects.Assignment;
-import canvas.apiobjects.CanvasFile;
-import canvas.apiobjects.Submission;
-import canvas.apiobjects.SubmissionComment;
+import canvas.apiobjects.*;
 import canvas.autograder.GradeCoordinator;
 import canvas.autograder.GradeWorker;
 import canvas.autograder.Lab;
@@ -34,7 +31,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static canvas.AutograderTest.TestVariant.*;
 import static canvas.Common.*;
@@ -72,10 +68,12 @@ public class AutograderTest {
     private static final Integer GROUP_CAT_ID = 70211;
     private static final String AG_HOST = "cis501@big09.seas.upenn.edu";
     private static final String AG_SOCKET_PORT = "10000";
-    private static final File RES_DIR = new File("/Users/devietti/Classes/canvas/src/test/resources/");
-    private static final Path GIT_WC_DIR = Paths.get("/Users/devietti/Classes/canvas/git.tmp");
+    private static final Path PROJECT_ROOT = Paths.get("/Users/devietti/Classes/perennial-comparch/CanvasUtils");
+    private static final File RES_DIR = PROJECT_ROOT.resolve("src/test/resources").toFile();
+    private static final Path GIT_WC_DIR = PROJECT_ROOT.resolve("git.tmp");
     private static final File CORRUPT_ZIP = new File(RES_DIR, "zeroes.zip");
     private static final File TINY_FILE = new File(RES_DIR,"tiny.v");
+    private static final String JAR_NAME = "CanvasUtils-2.0.0-jar-with-dependencies.jar";
 
     private static Process sshAutograder = null;
     private static Process sshTunnel = null;
@@ -103,9 +101,9 @@ public class AutograderTest {
         // ensure that the same version of the code is running here and on the autograder
         System.out.println("* checking jar checksums...");
         ProcessOutput local = Common.check_output(new ProcessBuilder("shasum",
-                "/Users/devietti/Classes/canvas/target/CanvasUtils-1.0-SNAPSHOT-jar-with-dependencies.jar"));
+                PROJECT_ROOT.resolve("target").resolve(JAR_NAME).toString()));
         ProcessOutput remote = Common.check_output(new ProcessBuilder("ssh", AG_HOST,
-                "shasum","CanvasUtils-1.0-SNAPSHOT-jar-with-dependencies.jar"));
+                "shasum",JAR_NAME));
         String localChecksum = local.stdout.split(" ")[0];
         String remoteChecksum = remote.stdout.split(" ")[0];
         if (!localChecksum.equals(remoteChecksum)) {
@@ -122,6 +120,12 @@ public class AutograderTest {
         }
 
         Common.useSandboxSite();
+
+        { // tear down previous autograder (if any)
+            System.out.println("* tearing down previous autograder...");
+            ProcessBuilder pb = new ProcessBuilder("ssh", AG_HOST, "killall java || true");
+            check_call(pb);
+        }
 
         // delete all existing assignments
         System.out.println("* deleting existing sandbox Assignments...");
@@ -146,7 +150,7 @@ public class AutograderTest {
             asn.name = l.shortName;
             asn.published = true;
             asn.submission_types = new String[]{"online_upload"};
-            asn.allowed_extensions = new String[]{FilenameUtils.getExtension(l.fileToSubmit.toString())};
+            asn.allowed_extensions = new String[]{"txt",FilenameUtils.getExtension(l.fileToSubmit.toString())};
             asn.group_category_id = realAsn.isGroupAssignment() ? GROUP_CAT_ID : null;
             asn.points_possible = realAsn.points_possible;
             ZonedDateTime due = ZonedDateTime.now(ZoneId.of("UTC")).plus(Duration.of(30, MINUTES));
@@ -165,7 +169,7 @@ public class AutograderTest {
         // launch test-mode autograder
         System.out.println("* launching autograder...");
         ProcessBuilder pb = new ProcessBuilder("ssh",AG_HOST,
-                "java", "-enableassertions", "-cp", "CanvasUtils-1.0-SNAPSHOT-jar-with-dependencies.jar",
+                "java", "-enableassertions", "-cp", JAR_NAME,
                 "canvas.autograder.GradeCoordinator","--test-mode","--port",AG_SOCKET_PORT);
         File sshStderr = new File(RES_DIR, "autograder.stderr");
         sshStderr.delete();
@@ -253,21 +257,18 @@ public class AutograderTest {
         public static Collection ctorParams() {
             List<Object[]> p = new LinkedList<>();
 
-            for (TestVariant v : EnumSet.allOf(TestVariant.class)) {
-            //for (TestVariant v : EnumSet.of(Initial)) {
-                /*
-                p.add(new Object[]{new Args("lab1", v, "lab1_complete.zip", 28, 344)});
-                p.add(new Object[]{new Args("lab2div", v, "lc4_divider_complete.v", 0, 6000)});
-                p.add(new Object[]{new Args("lab2alu", v, "alu_complete.zip", 0, 24112)});
+            //for (TestVariant v : EnumSet.allOf(TestVariant.class)) {
+            for (TestVariant v : EnumSet.of(LateSubmission)) {
+//                p.add(new Object[]{new Args("lab1", v, "lab1_complete.zip", 28, 344)});
+//                p.add(new Object[]{new Args("lab2div", v, "lc4_divider_complete.v", 0, 6000)});
+//                p.add(new Object[]{new Args("lab2alu", v, "alu_complete.zip", 0, 24112)});
+//                p.add(new Object[]{new Args("lab2gpn", v, "lc4_cla.v", 0, 2752512)});
                 p.add(new Object[]{new Args("lab3alu", v, "single_complete.zip", 1964, 75810)});
                 p.add(new Object[]{new Args("lab3full", v, "single_complete.zip", 88353, 1814570)});
-                */
-
                 p.add(new Object[]{new Args("lab4alu", v, "pipeline_complete.zip", 0/*1964*/, 83405)});
                 p.add(new Object[]{new Args("lab4full", v, "pipeline_complete.zip", 0/*88353*/, 2012063)});
-
                 p.add(new Object[]{new Args("lab5alu", v, "superscalar_complete.zip", 0, 83962)});
-                p.add(new Object[]{new Args("lab5full", v, "superscalar_complete.zip", 0, 2163330)});
+//                p.add(new Object[]{new Args("lab5full", v, "superscalar_complete.zip", 0, 2163330)});
 
                 // TODO: fix bug in Lab5full solution or ctrace
             }
@@ -300,9 +301,18 @@ public class AutograderTest {
             AssignmentDueDate add = new AssignmentDueDate();
             add.due_at = DateTimeFormatter.ISO_INSTANT.format(due);
             Common.putJSON(url, add, "assignment");
+            Thread.sleep(1_000); // wait a bit so due date change takes effect, sigh...
 
-            // Student2 does the submission
+            // StudentA does the submission
             Common.TOKEN = STUDENTA_TOKEN;
+
+            // if it's a group assignment, ensure that submitting student is part of the assignment group
+            if (asn.isGroupAssignment()) {
+                url = new GenericUrl(BASE_URL + "users/self/groups");
+                List<Group> myGroups = Common.getAsList(url, Group[].class);
+                assertEquals(1,myGroups.size());
+                assertEquals("lab group 1", myGroups.get(0).name);
+            }
 
             ProcessBuilder pb;
 
@@ -359,14 +369,12 @@ public class AutograderTest {
             final File fileToUpload;
             switch (ARGS.variant) {
                 case Initial:
+                case TwoFiles:
                     fileToUpload = initial;
                     break;
                 case Complete: // these all use the complete version of the lab
                 case LateSubmission:
                     fileToUpload = new File(RES_DIR, ARGS.completeFile);
-                    break;
-                case TwoFiles:
-                    fileToUpload = initial;
                     break;
                 case CorruptZip:
                     if (!submitZip) return;
@@ -406,8 +414,13 @@ public class AutograderTest {
             ms.submission.submission_type = "online_upload";
             if (TwoFiles == ARGS.variant) {
                 url = new GenericUrl(Common.CourseURL() + "assignments/" + asn.id + "/submissions/self/files");
-                CanvasFile emptyCanFile = Common.uploadFile(url, TINY_FILE);
-                ms.submission.file_ids = new int[]{cfile.id, emptyCanFile.id};
+                if (Arrays.asList(asn.allowed_extensions).contains("v")) {
+                    CanvasFile emptyCanFile = Common.uploadFile(url, TINY_FILE);
+                    ms.submission.file_ids = new int[]{cfile.id, emptyCanFile.id};
+                } else {
+                    CanvasFile emptyCanFile = Common.uploadFile(url, CORRUPT_ZIP);
+                    ms.submission.file_ids = new int[]{cfile.id, emptyCanFile.id};
+                }
             }
             HttpResponse resp = Common.postJSON(post, ms, null);
             Submission submitted = resp.parseAs(Submission.class);
@@ -421,8 +434,7 @@ public class AutograderTest {
             toAG.write(Run.ch);
             int i = fromAG.read();
             assertTrue(i >= 0);
-            //System.err.format("AG told us: %s %n", (-1 == i) ? "-1" : SocketMessage.values()[i].toString());
-
+            //System.err.format("AG told us: %c %n", i);
 
             String[] tokens = new String[]{STUDENTA_TOKEN};
             if (asn.isGroupAssignment()) {
@@ -521,7 +533,7 @@ public class AutograderTest {
         /** A version of Lab 1 that generates a fake grade for itself */
         @Test
         public void fakeGrade() throws IOException, InterruptedException {
-            Assignment asn = asnOfName.get("lab1").assn;
+            Assignment asn = asnOfName.get("lab2div").assn;
 
             // set due date (always do this as previous test may have been LateSubmission)
             Common.TOKEN = Common.INSTRUCTOR_TOKEN;
@@ -531,10 +543,10 @@ public class AutograderTest {
             add.due_at = DateTimeFormatter.ISO_INSTANT.format(due);
             Common.putJSON(url, add, "assignment");
 
-            // Student2 does the submission
+            // StudentA does the submission
             Common.TOKEN = STUDENTA_TOKEN;
 
-            File fileToUpload = new File(RES_DIR, "lab1-fakegrade.v");
+            File fileToUpload = new File(RES_DIR, "lab2div-fakegrade.v");
             assertTrue(fileToUpload.toString(), fileToUpload.canRead());
             url = new GenericUrl(Common.CourseURL() + "assignments/" + asn.id + "/submissions/self/files");
             CanvasFile cfile = Common.uploadFile(url, fileToUpload);
@@ -570,6 +582,7 @@ public class AutograderTest {
         @Test
         public void concurrentSubmissions() throws IOException {
             Assignment asn = asnOfName.get("lab1").assn;
+            assertFalse(asn.isGroupAssignment());
 
             // set due date (always do this as previous test may have been LateSubmission)
             Common.TOKEN = Common.INSTRUCTOR_TOKEN;
@@ -584,9 +597,8 @@ public class AutograderTest {
 
             // each test student does a submission
             final List<String> TOKENS = Arrays.asList(STUDENTA_TOKEN, STUDENTB_TOKEN, STUDENTC_TOKEN, STUDENTD_TOKEN);
-            List<Submission> initSubs = TOKENS.stream().map(token -> {
+            TOKENS.forEach(token -> {
                 Common.TOKEN = token;
-
                 GenericUrl url2 = new GenericUrl(Common.CourseURL() + "assignments/" + asn.id + "/submissions/self/files");
                 try {
                     CanvasFile cfile = Common.uploadFile(url2, fileToUpload);
@@ -598,12 +610,12 @@ public class AutograderTest {
                     ms.submission.submission_type = "online_upload";
 
                     HttpResponse resp = Common.postJSON(post, ms, null);
-                    return resp.parseAs(Submission.class);
+                    Submission sub = resp.parseAs(Submission.class);
+                    assertNotNull(sub);
                 } catch (IOException | InterruptedException e) {
                     fail(e.getLocalizedMessage());
                 }
-                return null;
-            }).collect(Collectors.toList());
+            });
 
             // put autograder into parallel mode
             toAG.write(ParallelGrading.ch);

@@ -203,7 +203,9 @@ public class GradeWorker {
         // TODO: replace test_data with a symlink to a single, shared copy
 
         final TestResult tr;
-        if (THE_LAB.fileToSubmit.toString().endsWith(".zip")) {
+        if (THE_LAB.shortName.equals("lab2gpn")) {
+            tr = runTest(THE_LAB, "'../common/other/run-sim.sh test_gpn ~/autograder-utils/testbench_cla_gpn.v lc4_cla.v'", SUBM_DIR);
+        } else if (THE_LAB.fileToSubmit.toString().endsWith(".zip")) {
             if (THE_LAB.shortName.endsWith("full")) {
                 tr = runTest(THE_LAB, "'export TEST_CASE=wireframe; make test'", SUBM_DIR);
             } else { // ALU-only lab

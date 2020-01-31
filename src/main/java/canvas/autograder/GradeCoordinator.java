@@ -98,6 +98,7 @@ public class GradeCoordinator {
             new Lab(7651954,  "lab2div", Paths.get("lc4_divider.v"), null, Paths.get("lab2-div")),
             new Lab(7513537,  "lab2alu", Paths.get("alu.zip"),
                     strs("lc4_divider.v", "lc4_cla.v", "lc4_alu.v", "output/alu.bit"), Paths.get("lab2-alu")),
+            new Lab(7513540,  "lab2gpn", Paths.get("lc4_cla.v"), null, Paths.get("lab2-alu")),
 
             new Lab(7513543, "lab3alu", Paths.get("single.zip"),
                     strs("lc4_regfile.v","lc4_single.v","lc4_divider.v","lc4_cla.v","lc4_alu.v","output/singlecycle.bit"),
