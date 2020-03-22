@@ -77,6 +77,9 @@ public class GradeCoordinator {
     //private static Path AG_OUTPUT_ROOT = FileSystems.getDefault().getPath("/Users/devietti/Classes/cis501-perennial/CanvasUtils/tmp/autograder-output");
     private final static int UPLOAD_FILE_SIZE_LIMIT = 5 * 1024 * 1024;
     private final static String UPLOAD_FILE_SIZE_LIMIT_STR = "5MB";
+    private final static String POWER_REPORT = "output/post_route_power_report.txt";
+    private final static String TIMING_REPORT = "output/post_route_timing_summary_report.txt";
+    private final static String UTILIZATION_REPORT = "output/post_route_utilization_report.txt";
     /**
      * Max output file size that we will try to email. Currently, 1MB
      */
@@ -101,24 +104,30 @@ public class GradeCoordinator {
             new Lab(7513540,  "lab2gpn", Paths.get("lc4_cla.v"), null, Paths.get("lab2-alu")),
 
             new Lab(7513543, "lab3alu", Paths.get("single.zip"),
-                    strs("lc4_regfile.v","lc4_single.v","lc4_divider.v","lc4_cla.v","lc4_alu.v","output/singlecycle.bit"),
+                    strs("lc4_regfile.v","lc4_single.v","lc4_divider.v","lc4_cla.v","lc4_alu.v","output/singlecycle.bit",
+                            POWER_REPORT,TIMING_REPORT,UTILIZATION_REPORT),
                     Paths.get("lab3-singlecycle")),
             new Lab(7513544, "lab3full", Paths.get("single.zip"),
-                    strs("lc4_regfile.v","lc4_single.v","lc4_divider.v","lc4_cla.v","lc4_alu.v","output/singlecycle.bit"),
+                    strs("lc4_regfile.v","lc4_single.v","lc4_divider.v","lc4_cla.v","lc4_alu.v","output/singlecycle.bit",
+                            POWER_REPORT,TIMING_REPORT,UTILIZATION_REPORT),
                     Paths.get("lab3-singlecycle")),
 
             new Lab(7513547,  "lab4alu", Paths.get("pipeline.zip"),
-                    strs("lc4_regfile.v", "lc4_pipeline.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/pipeline.bit"),
+                    strs("lc4_regfile.v", "lc4_pipeline.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/pipeline.bit",
+                            POWER_REPORT,TIMING_REPORT,UTILIZATION_REPORT),
                     Paths.get("lab4-pipeline")),
             new Lab(7513548,  "lab4full", Paths.get("pipeline.zip"),
-                    strs("lc4_regfile.v", "lc4_pipeline.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/pipeline.bit"),
+                    strs("lc4_regfile.v", "lc4_pipeline.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/pipeline.bit",
+                            POWER_REPORT,TIMING_REPORT,UTILIZATION_REPORT),
                     Paths.get("lab4-pipeline")),
 
             new Lab(7513549,  "lab5alu", Paths.get("superscalar.zip"),
-                    strs("lc4_regfile_ss.v", "lc4_superscalar.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/superscalar.bit"),
+                    strs("lc4_regfile_ss.v", "lc4_superscalar.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/superscalar.bit",
+                            POWER_REPORT,TIMING_REPORT,UTILIZATION_REPORT),
                     Paths.get("lab5-superscalar")),
             new Lab(7513550,  "lab5full", Paths.get("superscalar.zip"),
-                    strs("lc4_regfile_ss.v", "lc4_superscalar.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/superscalar.bit"),
+                    strs("lc4_regfile_ss.v", "lc4_superscalar.v", "lc4_divider.v","lc4_cla.v","lc4_alu.v","output/superscalar.bit",
+                            POWER_REPORT,TIMING_REPORT,UTILIZATION_REPORT),
                     Paths.get("lab5-superscalar"))
     };
     private static Set<String> strs(String... strs) {
@@ -397,7 +406,7 @@ public class GradeCoordinator {
         String pennkeys = subUsers.stream().map(u -> u.login_id).collect(Collectors.joining("-"));
 
         String subTimeLong = DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneId.of("America/New_York")).format(sub.submitted_at);
-        String submissionDirName = String.format("%s_%d_%s", pennkeys, sub.attempt, subTimeLong);
+        String submissionDirName = String.format("%s_%02d_%s", pennkeys, sub.attempt, subTimeLong);
         final Path SUBM_DIR = LAB_ROOT.resolve(submissionDirName);
         if (SUBM_DIR.toFile().isDirectory()) {
             // suppress this log message as it fills up the logs with garbage
