@@ -1,7 +1,6 @@
 package canvas;
 
 import canvas.apiobjects.*;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.json.gson.GsonFactory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -16,9 +15,7 @@ public class DownloadQuizResponses {
 
     public static void main(String[] args) throws IOException {
 
-        int critpathDelayId = -1, critpathLogicLevelsId = -1;
-        List<Double> criticalPathDelays = new LinkedList<>();
-        List<Double> criticalPathLogicLevels = new LinkedList<>();
+        List<Double> utcOffsets = new LinkedList<>();
 
         // read command-line args
         if (args.length != 1) {
@@ -28,47 +25,35 @@ public class DownloadQuizResponses {
         final String CSV_FILE = args[0];
 
         Common.setup();
-        final String quizId = Common.pickQuiz("timing results");
+        final String quizId = Common.pickQuiz("Remote Learning");
 
         // figure out which QuizQuestion(s) we want the answers for
         List<QuizQuestion> questions = Common.getAsList("quizzes/" + quizId + "/questions", QuizQuestion[].class);
 
-        for (QuizQuestion qq : questions) {
-            switch (qq.question_name) {
-                case "critical path delay":
-                    critpathDelayId = qq.id;
-                    break;
-                case "critical path length":
-                    critpathLogicLevelsId = qq.id;
-                    break;
-            }
-        }
-        assert (critpathDelayId != -1 && critpathLogicLevelsId != -1);
+        final QuizQuestion tzQuestion = questions.get(0);
 
         QuizSubmissionsWrapper quizSubsWrapper = Common.getAs("quizzes/" + quizId + "/submissions",
                 QuizSubmissionsWrapper.class);
 
         Map<Integer,QuizSubmission> mostRecentSubmissions = new HashMap<>();
-//        for (QuizSubmissionsWrapper qsw : quizSubsWrappers) {
-            for (QuizSubmission qsub : quizSubsWrapper.quiz_submissions) {
-                try {
-                    qsub.finished_at = Common.parseCanvasDate(qsub.finished_at_string);
-                } catch (DateTimeParseException e) {
-                    System.err.format("*** Invalid finished_at (%s) for user %d. Skipping...%n",
-                            qsub.finished_at_string, qsub.user_id);
-                    continue;
-                }
+        for (QuizSubmission qsub : quizSubsWrapper.quiz_submissions) {
+            try {
+                qsub.finished_at = Common.parseCanvasDate(qsub.finished_at_string);
+            } catch (DateTimeParseException e) {
+                System.err.format("*** Invalid finished_at (%s) for user %d. Skipping...%n",
+                        qsub.finished_at_string, qsub.user_id);
+                continue;
+            }
 
-                if (!mostRecentSubmissions.containsKey(qsub)) {
+            if (!mostRecentSubmissions.containsKey(qsub.user_id)) {
+                mostRecentSubmissions.put(qsub.user_id, qsub);
+            } else { // check if qsub is newer than entry in mostRecentSubmissions
+                QuizSubmission existing = mostRecentSubmissions.get(qsub.user_id);
+                if (qsub.finished_at.isAfter(existing.finished_at)) {
                     mostRecentSubmissions.put(qsub.user_id, qsub);
-                } else { // check if qsub is newer than entry in mostRecentSubmissions
-                    QuizSubmission existing = mostRecentSubmissions.get(qsub.user_id);
-                    if (qsub.finished_at.isAfter(existing.finished_at)) {
-                        mostRecentSubmissions.put(qsub.user_id, qsub);
-                    }
                 }
             }
-        //}
+        }
 
         for (QuizSubmission qsub : mostRecentSubmissions.values()) {
             QuizSubmissionEventsWrapper qsew = Common.getAs("quizzes/" + quizId + "/submissions/" + qsub.id + "/events",
@@ -85,10 +70,8 @@ public class DownloadQuizResponses {
                         // hack: Somehow, GsonFactory is putting in the name of a Java object as a string...
                         if (answer.toString().contains("java.lang.Object@")) continue;
 
-                        if (qa.quiz_question_id == critpathDelayId) {
-                            criticalPathDelays.add(Double.parseDouble(answer.toString()));
-                        } else if (qa.quiz_question_id == critpathLogicLevelsId) {
-                            criticalPathLogicLevels.add(Double.parseDouble(answer.toString()));
+                        if (qa.quiz_question_id == tzQuestion.id) {
+                            utcOffsets.add(Double.parseDouble(answer.toString()));
                         }
 
                     }
@@ -99,13 +82,10 @@ public class DownloadQuizResponses {
         // generate CSV file of the answers
         Writer w = new FileWriter(CSV_FILE);
         CSVPrinter csvPrinter = new CSVPrinter(w, CSVFormat.DEFAULT
-                .withHeader("CP Delay (ns)", "CP Logic Levels"));
+                .withHeader("UTC Offset"));
 
-        for (int i = 0; i < Math.max(criticalPathDelays.size(), criticalPathLogicLevels.size()); i++) {
-            double delay = i < criticalPathDelays.size() ? criticalPathDelays.get(i) : -1 ;
-            double logiclevels = i < criticalPathLogicLevels.size() ? criticalPathLogicLevels.get(i) : -1;
-
-            csvPrinter.printRecord(delay, logiclevels);
+        for (Double utco : utcOffsets) {
+            csvPrinter.printRecord(utco);
             csvPrinter.flush();
         }
         csvPrinter.close();
